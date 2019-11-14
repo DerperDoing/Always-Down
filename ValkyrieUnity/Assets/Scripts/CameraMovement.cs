@@ -17,14 +17,14 @@ public class CameraMovement : MonoBehaviour {
 		max= camBound.bounds.max;
 	}
 
-	void FixedUpdate () {
+	void Update () {
 			if ((target.position - transform.position).magnitude > xBound) {
 				Vector3 desiredPos = target.position + offset;
 				Vector3 smoothedPos = Vector3.Lerp (transform.position, desiredPos, speed);
 				transform.position = smoothedPos;
 			}
 
-		//Clamping Camera withing the Level Bounds
+		//Clamping/Limiting Camera within the Level Bounds
 		transform.position = new Vector3 (
 			Mathf.Clamp (transform.position.x, min.x + camHalfWidth, max.x - camHalfWidth),
 			Mathf.Clamp (transform.position.y, min.y + cam.orthographicSize, max.y - cam.orthographicSize),
