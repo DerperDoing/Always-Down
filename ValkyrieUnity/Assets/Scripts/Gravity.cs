@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Gravity : MonoBehaviour {
-	public float velocity, myGrav=9.8f;
+    public float count, velocity, myGrav=9.8f;
     public Coroutine co;
 	public bool collided;
 	Rigidbody2D rb;
@@ -15,16 +15,17 @@ public class Gravity : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        duration = 1;
+        count = 0f;
 		or = Input.deviceOrientation;
 		rb = GetComponent<Rigidbody2D> ();
+        objCol = GetComponent<Collider2D>();
         rotAngle = new Vector3(0, 0, 0);
 		Physics2D.gravity = new Vector2 (0,-myGrav);
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
 //		Physics2D.gravity = new Vector2 (9.8f, 0);
 	}
 
-    // Update is called once per frame
-   
     void move()
     {
         if (Input.deviceOrientation == DeviceOrientation.Portrait || Input.GetKeyDown(KeyCode.RightArrow))
@@ -39,7 +40,7 @@ public class Gravity : MonoBehaviour {
         {
             or = Input.deviceOrientation;
             Physics2D.gravity = new Vector2(-myGrav, 0);
-            rotAngle.z = -90;
+            rotAngle.z = 270;
             co =StartCoroutine(Rotating(rotAngle));
             Debug.Log("Inside MOVE()");
         }
@@ -63,46 +64,51 @@ public class Gravity : MonoBehaviour {
 
 
     void OnCollisionStay2D(Collision2D col){
-        Debug.Log("Before CollisionStay");
-		if ((rb != null) && !(rb.velocity.magnitude > 0) && (or != Input.deviceOrientation)) {
+        //Debug.Log("Before CollisionStay");
+		if ((rb != null) && (rb.velocity.magnitude < 0.001) && (or != Input.deviceOrientation) || Input.anyKeyDown) {
             Debug.Log("Calling Move()");
-			move ();
+            Physics2D.gravity = new Vector2(0, 0);
+            move ();
         }
-        Debug.Log("After CollisionStay");
+        //Debug.Log("After CollisionStay");
     }
 
     IEnumerator Rotating(Vector3 rotAngle)
     {
-        yield return new WaitForSeconds(0.1f);
-        int startTime = (int)Time.time;
-        int endTime = startTime + duration;
+        count = 0;
+        objCol.enabled = false;
+        yield return new WaitForSeconds(0.2f);
+        int startTime = (int)Time.unscaledDeltaTime;
+        //int endTime = startTime + duration;
         Debug.Log("Start= "+ startTime);
-        Debug.Log("End= " + endTime);
-        while (Time.time < endTime)
+        //Debug.Log("End= " + endTime);
+        while (count != duration)
         {
             velocity = rb.velocity.magnitude;
-            float progress = (Time.time - startTime) / duration;
-            Debug.Log("Time: " + Time.time);
-            // progress will equal 0 at startTime, 1 at endTime.
-            rb.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.Euler(this.rotAngle), progress);
-            //rb.transform.rotation = Quaternion.Euler(0, 0, Mathf.Lerp(this.transform.rotation.eulerAngles.z, this.rotAngle.z, progress));
+            Debug.Log("Rotation: " + rb.transform.eulerAngles + " rotAngle: " + rotAngle);
+            //float progress = (Time.unscaledDeltaTime - startTime) / duration;
+            Debug.Log("Difference: " + Mathf.Abs(rb.transform.eulerAngles.z - rotAngle.z));
+            if (Mathf.Abs(rb.transform.eulerAngles.z - rotAngle.z) < 30)
+            {
+                objCol.enabled = true;
+            }
+            rb.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.Euler(this.rotAngle), count);
             Debug.Log("BEFORE null");
+            count += Time.deltaTime;
             yield return null;
             Debug.Log("AFTER null");
-            if (rb.transform.rotation == Quaternion.Euler(rotAngle))
+            if (rb.transform.eulerAngles == rotAngle)
             {
-                
+                objCol.enabled = true;
                 Debug.Log("Stopping Corotuine");
                 StopCoroutine(co);
                 yield break;
             }
         }
+        //objCol.enabled = true;
         Debug.Log("Co Later");
     }
-    
-//	void OnCollisionExit2D(){
-//		collided = false;
-//	}
+
 
 //	void OnBecameInvisible(){
 //		if(rb!=null){
