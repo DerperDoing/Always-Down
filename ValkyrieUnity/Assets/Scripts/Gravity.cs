@@ -7,11 +7,12 @@ public class Gravity : MonoBehaviour {
     public Coroutine co;
 	public bool collided;
 	Rigidbody2D rb;
+    Collider2D objCol;
 	public GameObject gameOver;
-	public int flag=0;
-	public int duration=2;
+    public int duration;
 	DeviceOrientation or;
     Vector3 rotAngle;
+    [SerializeField]float timeCollider=0.25f;
 
 	// Use this for initialization
 	void Start () {
@@ -34,6 +35,7 @@ public class Gravity : MonoBehaviour {
             Physics2D.gravity = new Vector2(myGrav, 0);
             rotAngle.z = 90;
             co=StartCoroutine(Rotating(rotAngle));
+            StartCoroutine(EnableCollider());
             Debug.Log("Inside MOVE()");
         }
         else if (Input.deviceOrientation == DeviceOrientation.PortraitUpsideDown || Input.GetKeyDown(KeyCode.LeftArrow))
@@ -42,6 +44,7 @@ public class Gravity : MonoBehaviour {
             Physics2D.gravity = new Vector2(-myGrav, 0);
             rotAngle.z = 270;
             co =StartCoroutine(Rotating(rotAngle));
+            StartCoroutine(EnableCollider());
             Debug.Log("Inside MOVE()");
         }
         else if (Input.deviceOrientation == DeviceOrientation.LandscapeRight || Input.GetKeyDown(KeyCode.UpArrow))
@@ -50,6 +53,7 @@ public class Gravity : MonoBehaviour {
             Physics2D.gravity = new Vector2(0, myGrav);
             rotAngle.z = 180;
             co =StartCoroutine(Rotating(rotAngle));
+            StartCoroutine(EnableCollider());
             Debug.Log("Inside MOVE()");
         }
         else if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.GetKeyDown(KeyCode.DownArrow))
@@ -58,6 +62,7 @@ public class Gravity : MonoBehaviour {
             Physics2D.gravity = new Vector2(0, -myGrav);
             rotAngle.z = 0;
             co =StartCoroutine(Rotating(rotAngle));
+            StartCoroutine(EnableCollider());
             Debug.Log("Inside MOVE()");
         }
     }
@@ -77,21 +82,24 @@ public class Gravity : MonoBehaviour {
     {
         count = 0;
         objCol.enabled = false;
-        yield return new WaitForSeconds(0.2f);
-        int startTime = (int)Time.unscaledDeltaTime;
+        Debug.Log("objCol Status: " + objCol.enabled);
+        //yield return new WaitForSeconds(0.2f);
+        Debug.Log("objCol Status: " + objCol.enabled);
+        //int startTime = (int)Time.unscaledDeltaTime;
         //int endTime = startTime + duration;
-        Debug.Log("Start= "+ startTime);
+        //Debug.Log("Start= "+ startTime);
         //Debug.Log("End= " + endTime);
         while (count != duration)
         {
             velocity = rb.velocity.magnitude;
             Debug.Log("Rotation: " + rb.transform.eulerAngles + " rotAngle: " + rotAngle);
             //float progress = (Time.unscaledDeltaTime - startTime) / duration;
-            Debug.Log("Difference: " + Mathf.Abs(rb.transform.eulerAngles.z - rotAngle.z));
-            if (Mathf.Abs(rb.transform.eulerAngles.z - rotAngle.z) < 30)
+            Debug.Log("Time: " + Time.deltaTime);
+            //Debug.Log("Difference: " + Mathf.Abs(rb.transform.eulerAngles.z - rotAngle.z));
+            /*if (Mathf.Abs(rb.transform.eulerAngles.z - rotAngle.z) < 60)
             {
                 objCol.enabled = true;
-            }
+            }*/
             rb.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.Euler(this.rotAngle), count);
             Debug.Log("BEFORE null");
             count += Time.deltaTime;
@@ -99,9 +107,10 @@ public class Gravity : MonoBehaviour {
             Debug.Log("AFTER null");
             if (rb.transform.eulerAngles == rotAngle)
             {
-                objCol.enabled = true;
+                //objCol.enabled = true;
                 Debug.Log("Stopping Corotuine");
-                StopCoroutine(co);
+                //StopCoroutine(co);
+                StopAllCoroutines();
                 yield break;
             }
         }
@@ -109,6 +118,14 @@ public class Gravity : MonoBehaviour {
         Debug.Log("Co Later");
     }
 
+    IEnumerator EnableCollider()
+    {
+        Debug.Log("Inside EnableCollider");
+        yield return new WaitForSeconds(timeCollider);
+        Debug.Log("After Waiting EnableCollider");
+        objCol.enabled = true;
+        Debug.Log("objCol Status: " + objCol.enabled);
+    }
 
 //	void OnBecameInvisible(){
 //		if(rb!=null){
