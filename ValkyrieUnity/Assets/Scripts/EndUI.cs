@@ -42,7 +42,19 @@ public class EndUI : MonoBehaviour {
 		SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex) ;
 	}
 
-	public void Exit(){
+	public void Exit()
+    {
 		Application.Quit ();
 	}
+
+    public void Tutorial()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(0);
+    }
+    public void Level1()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(1);
+    }
 }
