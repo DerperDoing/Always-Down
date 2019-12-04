@@ -1,6 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+//using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Gravity : MonoBehaviour {
     public float count, velocity, myGrav=9.8f;
@@ -8,24 +9,48 @@ public class Gravity : MonoBehaviour {
 	public bool collided;
 	Rigidbody2D rb;
     Collider2D objCol;
-	public GameObject gameOver;
+	public EndUI gameOver;
     public int duration;
 	DeviceOrientation or;
     Vector3 rotAngle;
     [SerializeField]float timeCollider=0.25f;
 
-	// Use this for initialization
-	void Start () {
+    void Start () {
         duration = 1;
         count = 0f;
 		or = Input.deviceOrientation;
 		rb = GetComponent<Rigidbody2D> ();
         objCol = GetComponent<Collider2D>();
         rotAngle = new Vector3(0, 0, 0);
-		Physics2D.gravity = new Vector2 (0,-myGrav);
-		Screen.sleepTimeout = SleepTimeout.NeverSleep;
-//		Physics2D.gravity = new Vector2 (9.8f, 0);
-	}
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            Physics2D.gravity = new Vector2(0, -myGrav);
+        }
+        else if (SceneManager.GetActiveScene().buildIndex == 2)
+        {
+            if (Input.deviceOrientation == DeviceOrientation.PortraitUpsideDown)
+            {
+                Physics2D.gravity = new Vector2(-myGrav, 0);
+                rb.transform.eulerAngles = new Vector3(0, 0, 270);
+            }
+            else if (Input.deviceOrientation == DeviceOrientation.Portrait)
+            {
+                Physics2D.gravity = new Vector2(myGrav, 0);
+                rb.transform.eulerAngles = new Vector3(0, 0, 90);
+            }
+            else if(Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
+            {
+                Physics2D.gravity = new Vector2(0, -myGrav);
+            }
+            else if (Input.deviceOrientation == DeviceOrientation.LandscapeRight)
+            {
+                Physics2D.gravity = new Vector2(0,myGrav);
+                rb.transform.eulerAngles = new Vector3(0, 0, 180);
+            }
+
+        }
+    }
 
     void move()
     {
@@ -70,7 +95,7 @@ public class Gravity : MonoBehaviour {
 
     void OnCollisionStay2D(Collision2D col){
         //Debug.Log("Before CollisionStay");
-		if ((rb != null) && (rb.velocity.magnitude < 0.001) && (or != Input.deviceOrientation) || Input.anyKeyDown) {
+		if ((rb != null) && (rb.velocity.magnitude < 0.001) && (or != Input.deviceOrientation) /*|| Input.anyKeyDown*/) {
             Debug.Log("Calling Move()");
             Physics2D.gravity = new Vector2(0, 0);
             move ();
@@ -102,7 +127,7 @@ public class Gravity : MonoBehaviour {
             }*/
             rb.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.Euler(this.rotAngle), count);
             Debug.Log("BEFORE null");
-            count += Time.deltaTime;
+            count += Time.unscaledDeltaTime;
             yield return null;
             Debug.Log("AFTER null");
             if (rb.transform.eulerAngles == rotAngle)
@@ -127,11 +152,15 @@ public class Gravity : MonoBehaviour {
         Debug.Log("objCol Status: " + objCol.enabled);
     }
 
-//	void OnBecameInvisible(){
-//		if(rb!=null){
-//			gameOver.SetActive (true);
-////			Destroy (rb);
-//			//Time.timeScale = 0f;
-//		}
-//	}
+/*    void OnBecameInvisible()
+    {
+        if (rb != null)
+        {
+            Destroy(rb);
+            gameOver.Restart();
+            //gameOver.SetActive(true);
+            
+            //Time.timeScale = 0f;
+        }
+    }*/
 }

@@ -5,12 +5,11 @@ public class EndUI : MonoBehaviour {
 	
 	public GameObject PauseMenuUI;
 	bool paused;
-
-	void Start()
+    void Start()
 	{
 		PauseMenuUI.SetActive (false);
 		paused = false;
-	}
+    }
 
 	void Update()
 	{
@@ -23,7 +22,7 @@ public class EndUI : MonoBehaviour {
 		}	
 	}
 
-	public void Resume()
+    public void Resume()
 	{
 		PauseMenuUI.SetActive (false);
 		Time.timeScale = 1;
@@ -39,22 +38,26 @@ public class EndUI : MonoBehaviour {
 
 	public void Restart(){
 		Time.timeScale = 1;
-		SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex) ;
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex) ;
 	}
 
 	public void Exit()
     {
+        PlayerPrefs.SetInt("FirstTime", 1);
 		Application.Quit ();
 	}
 
     public void Tutorial()
     {
+        PlayerPrefs.SetInt("FirstTime", 2);
+        PlayerPrefs.Save();
         Time.timeScale = 1;
         SceneManager.LoadScene(0);
     }
+
     public void Level1()
     {
         Time.timeScale = 1;
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(0);
     }
 }
