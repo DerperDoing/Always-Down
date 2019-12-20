@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 //using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class Gravity : MonoBehaviour {
-    public float count, velocity, myGrav=9.8f;
+    public float textFadeOutTime, count, velocity, myGrav=9.8f;
     public Coroutine co;
 	public bool collided;
 	Rigidbody2D rb;
@@ -13,9 +14,11 @@ public class Gravity : MonoBehaviour {
     public int duration;
 	DeviceOrientation or;
     Vector3 rotAngle;
+    public Text levelDisplayer;
     [SerializeField]float timeCollider=0.25f;
 
     void Start () {
+        Time.timeScale = 1;
         duration = 1;
         count = 0f;
 		or = Input.deviceOrientation;
@@ -48,7 +51,8 @@ public class Gravity : MonoBehaviour {
                 Physics2D.gravity = new Vector2(0,myGrav);
                 rb.transform.eulerAngles = new Vector3(0, 0, 180);
             }
-
+            StartCoroutine(FadeOutRoutine());
+            StopCoroutine(FadeOutRoutine());
         }
     }
 
@@ -152,15 +156,28 @@ public class Gravity : MonoBehaviour {
         Debug.Log("objCol Status: " + objCol.enabled);
     }
 
-/*    void OnBecameInvisible()
-    {
-        if (rb != null)
+    /*    void OnBecameInvisible()
         {
-            Destroy(rb);
-            gameOver.Restart();
-            //gameOver.SetActive(true);
-            
-            //Time.timeScale = 0f;
+            if (rb != null)
+            {
+                Destroy(rb);
+                gameOver.Restart();
+                //gameOver.SetActive(true);
+
+                //Time.timeScale = 0f;
+            }
+        }*/
+
+    private IEnumerator FadeOutRoutine()
+    {
+        levelDisplayer.color = new Color(levelDisplayer.color.r, levelDisplayer.color.g, levelDisplayer.color.b, 1);
+        while (levelDisplayer.color.a > 0.0f)
+        {
+            levelDisplayer.color = new Color(levelDisplayer.color.r, levelDisplayer.color.g, levelDisplayer.color.b, levelDisplayer.color.a - (Time.deltaTime / textFadeOutTime));
+            yield return null;
         }
-    }*/
+        GameObject can = GameObject.Find("Canvas 2");
+        Time.timeScale = 1;
+        can.SetActive(false);
+    }
 }

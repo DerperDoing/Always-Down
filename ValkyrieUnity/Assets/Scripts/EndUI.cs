@@ -37,8 +37,8 @@ public class EndUI : MonoBehaviour {
 	}
 
 	public void Restart(){
-		Time.timeScale = 1;
-		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex) ;
+		//Time.timeScale = 1;
+		SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex) ;
 	}
 
 	public void Exit()

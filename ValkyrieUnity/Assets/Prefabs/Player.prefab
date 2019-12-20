@@ -4976,9 +4976,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cd6c83f1933d894cae52049453eecfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocity: 0
-  myGrav: 9.8
+  textFadeOutTime: 1
+  count: 0
+  velocity: 10
+  myGrav: 20
   collided: 0
   gameOver: {fileID: 0}
-  flag: 0
-  duration: 2
+  duration: 5
+  levelDisplayer: {fileID: 0}
+  timeCollider: 0.25
